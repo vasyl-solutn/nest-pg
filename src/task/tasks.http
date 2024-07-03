@@ -1,0 +1,12 @@
+POST http://localhost:3000/tasks HTTP/1.1
+content-type: application/json
+
+{
+  "title": "New Task",
+  "description": "Description of the new task",
+  "isCompleted": false
+}
+
+
+###
+GET http://localhost:3000/tasks HTTP/1.1
