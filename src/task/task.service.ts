@@ -40,46 +40,4 @@ export class TaskService {
   async remove(id: string): Promise<void> {
     await this.taskRepository.delete(id);
   }
-
-  async relateTasks(taskId: number, relatedTaskId: number): Promise<void> {
-    const task = await this.taskRepository.findOneBy({ id: taskId });
-    const relatedTask = await this.taskRepository.findOneBy({
-      id: relatedTaskId,
-    });
-
-    if (!task || !relatedTask) {
-      throw new NotFoundException('One or both tasks not found');
-    }
-
-    const taskRelation = new TaskRelations();
-    taskRelation.upwardsTask = task; // Assuming this is the direction you want
-    taskRelation.downwardsTask = relatedTask; // Adjust according to your logic
-
-    await this.taskRelationsRepository.save(taskRelation);
-  }
-
-  async unrelateTasks(taskId: number, relatedTaskId: number): Promise<void> {
-    // TODO: refactor by instantiate this object more elegant of form the condition better
-    const upwardsTask = new Task();
-    upwardsTask.id = taskId;
-
-    const downwardsTask = new Task();
-    downwardsTask.id = relatedTaskId;
-
-    // TODO: does it work?
-    const relation = await this.taskRelationsRepository.findOne({
-      where: [
-        { upwardsTask, downwardsTask },
-        // { upwardsTask: relatedTaskId, downwardsTask: taskId } // Assuming bidirectional removal
-      ],
-    });
-
-    if (!relation) {
-      throw new NotFoundException(
-        'The relationship between the specified tasks does not exist.',
-      );
-    }
-
-    await this.taskRelationsRepository.remove(relation);
-  }
 }

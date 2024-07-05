@@ -38,20 +38,4 @@ export class TaskController {
   remove(@Param('id') id: string): Promise<void> {
     return this.taskService.remove(id);
   }
-
-  @Post(':taskId/relate/:relatedTaskId')
-  async relateTasks(
-    @Param('taskId') taskId: number,
-    @Param('relatedTaskId') relatedTaskId: number,
-  ): Promise<void> {
-    return this.taskService.relateTasks(taskId, relatedTaskId);
-  }
-
-  @Delete(':taskId/unrelate/:relatedTaskId')
-  async unrelateTasks(
-    @Param('taskId') taskId: number,
-    @Param('relatedTaskId') relatedTaskId: number,
-  ): Promise<void> {
-    return this.taskService.unrelateTasks(taskId, relatedTaskId);
-  }
 }
