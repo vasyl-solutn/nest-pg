@@ -2,7 +2,7 @@ POST http://localhost:3000/tasks HTTP/1.1
 content-type: application/json
 
 {
-  "title": "New Task",
+  "title": "Task 3",
   "description": "Description of the new task",
   "isCompleted": false
 }
@@ -10,3 +10,7 @@ content-type: application/json
 
 ###
 GET http://localhost:3000/tasks HTTP/1.1
+
+###
+POST http://localhost:3000/tasks/1/relate/3 HTTP/1.1
+content-type: application/json

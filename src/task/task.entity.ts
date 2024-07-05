@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { TaskRelations } from './task-relations.entity';
 
 @Entity()
 export class Task {
@@ -13,4 +14,10 @@ export class Task {
 
   @Column({ default: false })
   isCompleted: boolean;
+
+  @OneToMany(() => TaskRelations, (taskRelation) => taskRelation.downwardsTask)
+  downwardsTasks: TaskRelations[];
+
+  @OneToMany(() => TaskRelations, (taskRelation) => taskRelation.upwardsTask)
+  upwardsTasks: TaskRelations[];
 }

@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TaskModule } from './task/task.module';
 import { Task } from './task/task.entity';
+import { TaskRelations } from './task/task-relations.entity';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { Task } from './task/task.entity';
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [Task],
+      entities: [Task, TaskRelations],
       synchronize: true, // Note: set to false in production
     }),
     TaskModule,
