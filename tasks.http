@@ -7,10 +7,14 @@ content-type: application/json
   "isCompleted": false
 }
 
-
 ###
 GET http://localhost:3000/tasks HTTP/1.1
 
 ###
-POST http://localhost:3000/tasks/1/relate/3 HTTP/1.1
+POST http://localhost:3000/task-relations/2/relate/1 HTTP/1.1
 content-type: application/json
+
+###
+GET http://localhost:3000/task-relations/1/related HTTP/1.1
+
+

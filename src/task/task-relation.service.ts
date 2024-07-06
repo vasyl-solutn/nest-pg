@@ -30,6 +30,29 @@ export class TaskRelationService {
     await this.taskRelationsRepository.save(taskRelation);
   }
 
+  async getRelatedTasks(taskId: number): Promise<{ upwards: Task[], downwards: Task[] }> {
+    const task = await this.taskRepository.findOneBy({ id: taskId });
+
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    const upwardsRelations = await this.taskRelationsRepository.find({
+      where: { downwardsTask: { id: taskId } },
+      relations: ['upwardsTask'],
+    });
+
+    const downwardsRelations = await this.taskRelationsRepository.find({
+      where: { upwardsTask: { id: taskId } },
+      relations: ['downwardsTask'],
+    });
+
+    return {
+      upwards: upwardsRelations.map(relation => relation.upwardsTask),
+      downwards: downwardsRelations.map(relation => relation.downwardsTask),
+    };
+  }
+
   async unrelateTasks(taskId: number, relatedTaskId: number): Promise<void> {
     // TODO: refactor by instantiate this object more elegant of form the condition better
     const upwardsTask = new Task();
