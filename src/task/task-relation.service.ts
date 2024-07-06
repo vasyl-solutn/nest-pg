@@ -30,7 +30,9 @@ export class TaskRelationService {
     await this.taskRelationsRepository.save(taskRelation);
   }
 
-  async getRelatedTasks(taskId: number): Promise<{ upwards: Task[], downwards: Task[] }> {
+  async getRelatedTasks(
+    taskId: number,
+  ): Promise<{ upwards: Task[]; downwards: Task[] }> {
     const task = await this.taskRepository.findOneBy({ id: taskId });
 
     if (!task) {
