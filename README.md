@@ -31,8 +31,9 @@ $ pnpm run start:prod
 ```
 
 ### run both project simulteneusly
+pnpm install
 
-pnpm run dev
+pnpm dev
 
 
 ## Test
