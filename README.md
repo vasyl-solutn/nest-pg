@@ -30,6 +30,11 @@ $ pnpm run start:dev
 $ pnpm run start:prod
 ```
 
+### run both project simulteneusly
+
+pnpm run dev
+
+
 ## Test
 
 ```bash
