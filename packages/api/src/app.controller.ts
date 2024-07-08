@@ -6,7 +6,8 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('data')
-  getData() {
-    return { message: 'Hello from NestJS!' };
+  async getData() {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    return this.appService.getHello();
   }
 }

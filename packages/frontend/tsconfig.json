@@ -17,10 +17,13 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "types": ["@testing-library/jest-dom", "jest", "node"],
     "noEmit": true,
     "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src",
+    "src/setupTests.ts",
+    "types"
   ]
 }
