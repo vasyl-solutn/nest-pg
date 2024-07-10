@@ -23,10 +23,15 @@ function App() {
   }, []);
 
   const handleTaskClick = (task: Task) => {
-    setSelectedTask(task);
-    fetch(`http://localhost:3001/task-relations/${task.id}/related`)
-      .then(response => response.json())
-      .then(setRelatedTasks);
+    if (selectedTask === task) {
+      setSelectedTask(null);
+      setRelatedTasks(null);
+    } else {
+      setSelectedTask(task);
+      fetch(`http://localhost:3001/task-relations/${task.id}/related`)
+        .then(response => response.json())
+        .then(setRelatedTasks);
+    }
   };
 
   const handleRelateTask = (relatedTaskId: number) => {
@@ -34,7 +39,6 @@ function App() {
       fetch(`http://localhost:3001/task-relations/${selectedTask.id}/relate/${relatedTaskId}`, {
         method: 'POST',
       }).then(() => {
-        // Refresh related tasks after relating
         handleTaskClick(selectedTask);
       });
     }
@@ -45,7 +49,6 @@ function App() {
       fetch(`http://localhost:3001/task-relations/${taskId}/unrelate/${relatedTaskId}`, {
         method: 'DELETE',
       }).then(() => {
-        // Refresh related tasks after unrelating
         handleTaskClick(selectedTask);
       });
     }
