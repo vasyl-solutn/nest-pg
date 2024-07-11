@@ -17,6 +17,7 @@ import { TaskRelations } from './task/task-relations.entity';
       database: process.env.DATABASE_NAME,
       entities: [Task, TaskRelations],
       synchronize: true, // Note: set to false in production
+      logging: ['query'],
     }),
     TaskModule,
   ],

@@ -13,8 +13,16 @@ export class TaskService {
     private taskRelationsRepository: Repository<TaskRelations>,
   ) {}
 
-  findAll(): Promise<Task[]> {
-    return this.taskRepository.find();
+  async findAll(search?: string): Promise<Task[]> {
+    const queryBuilder = this.taskRepository.createQueryBuilder('task');
+
+    if (search) {
+      queryBuilder
+        .where('task.title ILIKE :search')
+        .setParameter('search', `%${search}%`);
+    }
+
+    return queryBuilder.getMany();
   }
 
   findOne(id: string): Promise<Task> {

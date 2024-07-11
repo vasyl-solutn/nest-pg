@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { Task } from './task.entity';
@@ -15,8 +16,8 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Get()
-  findAll(): Promise<Task[]> {
-    return this.taskService.findAll();
+  findAll(@Query('query') search: string): Promise<Task[]> {
+    return this.taskService.findAll(search);
   }
 
   @Get(':id')

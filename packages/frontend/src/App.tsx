@@ -11,6 +11,11 @@ interface RelatedTasks {
   downwards: Task[];
 }
 
+type AutocompleteResult = {
+  id: string;
+  title: string;
+};
+
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -21,6 +26,21 @@ function App() {
       .then(response => response.json())
       .then(setTasks);
   }, []);
+
+  const [inputValue, setInputValue] = useState('');
+  const [autocompleteResults, setAutocompleteResults] = useState<AutocompleteResult[]>([]);
+
+  useEffect(() => {
+    if (inputValue) {
+      fetch(`http://localhost:3001/tasks/?query=${inputValue}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setAutocompleteResults(data.slice(0, 5)); // Limit to 5 items
+        });
+    } else {
+      setAutocompleteResults([]); // Clear results if input is cleared
+    }
+  }, [inputValue]);
 
   const handleTaskClick = (task: Task) => {
     if (selectedTask === task) {
@@ -56,6 +76,34 @@ function App() {
 
   return (
     <>
+      <div style={{ padding: '10px' }}>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Type part of the task name..."
+          style={{ width: '100%', marginBottom: '10px' }}
+        />
+        {autocompleteResults.length > 0 && (
+          <div style={{ position: 'relative' }}>
+            <ul style={{ position: 'absolute', width: '100%', background: 'white', listStyle: 'none', padding: 0 }}>
+              {autocompleteResults.map((result) => (
+                <li
+                  key={result.id}
+                  style={{ padding: '5px', cursor: 'pointer' }}
+                  onClick={() => {
+                    setInputValue(result.title); // Update input with selected title
+                    setAutocompleteResults([]); // Clear results
+                  }}
+                >
+                  {result.title}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
       <h1 style={{ width: '100%', textAlign: 'center' }}>Items relations</h1>
       <div style={{ padding: '10px' }}>
         {tasks.length > 0 ? (
