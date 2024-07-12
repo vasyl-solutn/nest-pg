@@ -11,24 +11,13 @@ interface RelatedTasks {
   downwards: Task[];
 }
 
-type AutocompleteResult = {
-  id: string;
-  title: string;
-};
-
 function App() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [relatedTasks, setRelatedTasks] = useState<RelatedTasks | null>(null);
 
-  useEffect(() => {
-    fetch('http://localhost:3001/tasks')
-      .then(response => response.json())
-      .then(setTasks);
-  }, []);
-
   const [inputValue, setInputValue] = useState('');
-  const [autocompleteResults, setAutocompleteResults] = useState<AutocompleteResult[]>([]);
+  const [autocompleteResults, setAutocompleteResults] = useState<Task[]>([]);
 
   useEffect(() => {
     if (inputValue) {
@@ -92,8 +81,9 @@ function App() {
                   key={result.id}
                   style={{ padding: '5px', cursor: 'pointer' }}
                   onClick={() => {
-                    setInputValue(result.title); // Update input with selected title
-                    setAutocompleteResults([]); // Clear results
+                    setInputValue(result.title);
+                    setAutocompleteResults([]);
+                    setTasks([...tasks, result]);
                   }}
                 >
                   {result.title}
@@ -132,7 +122,6 @@ function App() {
         {selectedTask && (
           <div>
             <h3>Selected Task: {selectedTask.title}</h3>
-            <p>{selectedTask.description}</p>
             <h4>Related Tasks:</h4>
             {relatedTasks ? (
               <div>
