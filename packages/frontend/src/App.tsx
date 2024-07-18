@@ -35,12 +35,16 @@ function App() {
     if (selectedTask === task) {
       setSelectedTask(null);
       setRelatedTasks(null);
-    } else {
+    } else if (task) {
       setSelectedTask(task);
-      fetch(`http://localhost:3001/task-relations/${task.id}/related`)
-        .then(response => response.json())
-        .then(setRelatedTasks);
+      refreshChildren(task.id);
     }
+  };
+
+  const refreshChildren = (taskId: number) => {
+    fetch(`http://localhost:3001/task-relations/${taskId}/related`)
+      .then(response => response.json())
+      .then(setRelatedTasks);
   };
 
   const handleRelateTask = (relatedTaskId: number) => {
@@ -64,7 +68,7 @@ function App() {
       fetch(`http://localhost:3001/task-relations/${taskId}/unrelate/${relatedTaskId}`, {
         method: 'DELETE',
       }).then(() => {
-        handleTaskClick(selectedTask);
+        refreshChildren(selectedTask.id);
       });
     }
   };
@@ -163,7 +167,8 @@ function App() {
                 task={task}
                 isSelected={selectedTask?.id === task.id}
                 handleTaskClick={handleTaskClick}
-             />
+                handleUnrelateTask={handleUnrelateTask}
+              />
             ))}
           </>
         ) : (
@@ -181,10 +186,8 @@ function App() {
                   task={task}
                   isSelected={selectedTask?.id === task.id}
                   handleTaskClick={handleTaskClick}
+                  handleUnrelateTask={handleUnrelateTask}
                 />
-                <button onClick={() => handleUnrelateTask(selectedTask.id, task.id)}>
-                  Unrelate
-                </button>
               </div>
             )}
           </div>

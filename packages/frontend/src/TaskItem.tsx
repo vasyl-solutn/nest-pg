@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Task } from './App';
 
-const TaskItem = ({ task, isSelected, handleTaskClick }: { task: Task, isSelected: boolean, handleTaskClick: (task: Task) => void }) => {
+const TaskItem = ({ task, isSelected, handleTaskClick, handleUnrelateTask }: { task: Task, isSelected: boolean, handleTaskClick: (task: Task) => void, handleUnrelateTask: (selectedTaskId: number, taskId: number) => void }) => {
   const [upwardsTasks, setUpwardsTasks] = useState<Task[]>([]);
+  const [refreshFlag, setRefreshFlag] = useState(false);
 
   useEffect(() => {
     const fetchUpwardsTasks = async () => {
@@ -19,7 +20,7 @@ const TaskItem = ({ task, isSelected, handleTaskClick }: { task: Task, isSelecte
     };
 
     fetchUpwardsTasks();
-  }, [task.id]);
+  }, [task.id, refreshFlag]);
 
   return (
     <div
@@ -42,6 +43,8 @@ const TaskItem = ({ task, isSelected, handleTaskClick }: { task: Task, isSelecte
       <div
         style={{
           paddingLeft: '15pt',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
           {upwardsTasks.map((upTask: Task) => (
@@ -57,6 +60,32 @@ const TaskItem = ({ task, isSelected, handleTaskClick }: { task: Task, isSelecte
               }}
             >
               {upTask.title}
+              <button
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  marginLeft: '5px',
+                }}
+                onClick={() => {
+                  handleUnrelateTask(upTask.id, task.id);
+                  setRefreshFlag(prevFlag => !prevFlag);
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 6L6 18M6 6l12 12"></path>
+                </svg>
+              </button>
             </div>
           ))}
         </div>
