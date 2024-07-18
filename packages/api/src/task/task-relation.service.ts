@@ -24,8 +24,8 @@ export class TaskRelationService {
     }
 
     const taskRelation = new TaskRelations();
-    taskRelation.upwardsTask = task; // Assuming this is the direction you want
-    taskRelation.downwardsTask = relatedTask; // Adjust according to your logic
+    taskRelation.upwardsTask = task;
+    taskRelation.downwardsTask = relatedTask;
 
     await this.taskRelationsRepository.save(taskRelation);
   }
@@ -50,8 +50,8 @@ export class TaskRelationService {
     });
 
     return {
-      upwards: upwardsRelations.map(relation => relation.upwardsTask),
-      downwards: downwardsRelations.map(relation => relation.downwardsTask),
+      upwards: upwardsRelations.map((relation) => relation.upwardsTask),
+      downwards: downwardsRelations.map((relation) => relation.downwardsTask),
     };
   }
 

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
+import TaskItem from './TaskItem';
 
-interface Task {
+export interface Task {
   id: number;
   title: string;
-  description: string;
 }
 
 interface RelatedTasks {
@@ -53,6 +53,12 @@ function App() {
     }
   };
 
+  const relateTasks = (upwardsTaskId: number, downwardsTaskId: number) => {
+    fetch(`http://localhost:3001/task-relations/${upwardsTaskId}/relate/${downwardsTaskId}`, {
+      method: 'POST',
+    })
+  };
+
   const handleUnrelateTask = (taskId: number, relatedTaskId: number) => {
     if (selectedTask) {
       fetch(`http://localhost:3001/task-relations/${taskId}/unrelate/${relatedTaskId}`, {
@@ -71,22 +77,75 @@ function App() {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Type part of the task name..."
-          style={{ width: '100%', marginBottom: '10px' }}
+          style={{ width: '60%', marginBottom: '10px' }}
         />
+
+        <button onClick={async () => {
+          const newTask: Task = {
+            id: NaN,
+            title: inputValue
+          };
+
+          await fetch('http://localhost:3001/tasks', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ title: inputValue }),
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('new task data', data)
+            newTask.id = data.id;
+          })
+          .catch((error) => {
+            throw new Error(error);
+          });
+
+          console.log('new task id', newTask)
+
+          setTasks([...tasks, newTask]);
+          setInputValue("");
+        }}>Add new</button>
+
         {autocompleteResults.length > 0 && (
           <div style={{ position: 'relative' }}>
             <ul style={{ position: 'absolute', width: '100%', background: 'white', listStyle: 'none', padding: 0 }}>
               {autocompleteResults.map((result) => (
                 <li
                   key={result.id}
-                  style={{ padding: '5px', cursor: 'pointer' }}
-                  onClick={() => {
-                    setInputValue(result.title);
-                    setAutocompleteResults([]);
-                    setTasks([...tasks, result]);
-                  }}
                 >
-                  {result.title}
+                  <div
+                    style={{ padding: '5px', cursor: 'pointer', display: 'inline' }}
+                    onClick={() => {
+                      setInputValue(result.title);
+                      setAutocompleteResults([]);
+                      setTasks([...tasks, result]);
+                    }}
+                  >
+                    {result.title}
+                  </div>
+                  {selectedTask &&
+                    <>
+                      <button
+                        onClick={() => {
+                          // setAutocompleteResults([]);
+                          relateTasks(result.id, selectedTask.id);
+                        }}
+                      >
+                        add as a parent
+                      </button>
+                      <button
+                        style={{ marginLeft: '5px' }}
+                        onClick={() => {
+                          // setAutocompleteResults([]);
+                          relateTasks(selectedTask.id, result.id);
+                        }}
+                      >
+                        add as a chield
+                      </button>
+                    </>
+                  }
                 </li>
               ))}
             </ul>
@@ -94,69 +153,45 @@ function App() {
         )}
       </div>
 
-      <h1 style={{ width: '100%', textAlign: 'center' }}>Items relations</h1>
-      <div style={{ padding: '10px' }}>
+      <h1 style={{ width: '100%', textAlign: 'center' }}>Item relations</h1>
+      <div style={{ padding: '10px', display: 'flex' }}>
         {tasks.length > 0 ? (
           <>
             {tasks.map((task) => (
-              <div
+              <TaskItem
                 key={task.id}
-                style={{
-                  background: selectedTask?.id === task.id ? 'lightgreen' : 'lightblue',
-                  borderRadius: '45%',
-                  padding: '10px 20px',
-                  margin: '5px',
-                  display: 'inline-block',
-                  cursor: 'pointer'
-                }}
-                onClick={() => handleTaskClick(task)}
-              >
-                {task.title}
-              </div>
+                task={task}
+                isSelected={selectedTask?.id === task.id}
+                handleTaskClick={handleTaskClick}
+             />
             ))}
           </>
         ) : (
           'Loading tasks...'
         )}
-
-        {selectedTask && (
-          <div>
-            <h3>Selected Task: {selectedTask.title}</h3>
-            <h4>Related Tasks:</h4>
-            {relatedTasks ? (
-              <div>
-                <h5>Upwards:</h5>
-                {relatedTasks.upwards.map(task => (
-                  <div key={task.id}>
-                    {task.title}
-                    <button onClick={() => handleUnrelateTask(task.id, selectedTask.id)}>Unrelate</button>
-                  </div>
-                ))}
-                <h5>Downwards:</h5>
-                {relatedTasks.downwards.map(task => (
-                  <div key={task.id}>
-                    {task.title}
-                    <button onClick={() => handleUnrelateTask(selectedTask.id, task.id)}>Unrelate</button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              'Loading related tasks...'
-            )}
-            <h4>Relate to:</h4>
-            {tasks.filter(task => task.id !== selectedTask.id &&
-                          !relatedTasks?.upwards.some(t => t.id === task.id) &&
-                          !relatedTasks?.downwards.some(t => t.id === task.id))
-              .map(task => (
-                <div key={task.id}>
-                  {task.title}
-                  <button onClick={() => handleRelateTask(task.id)}>Relate</button>
-                </div>
-              ))
-            }
-          </div>
-        )}
       </div>
+      {selectedTask && relatedTasks ? (
+        <>
+          <h3>Related</h3>
+          <div style={{ display: 'flex'}}>
+            {relatedTasks.downwards.map(task =>
+              <div>
+                <TaskItem
+                  key={task.id}
+                  task={task}
+                  isSelected={selectedTask?.id === task.id}
+                  handleTaskClick={handleTaskClick}
+                />
+                <button onClick={() => handleUnrelateTask(selectedTask.id, task.id)}>
+                  Unrelate
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        'Loading related tasks...'
+      )}
     </>
   );
 }
